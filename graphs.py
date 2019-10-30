@@ -15,14 +15,15 @@ def connection_db():
 
 def choose_unit(p_table):
     table = ''
-    units = {1: 'USD',
-         2: 'EUR',
-         3: 'DKK',
-         4: 'CAD',
-         5: 'SEK',
-         6: 'CHF',
-         7: 'JPY',
-         8: 'AUD'}
+    units = {
+        1: 'USD',
+        2: 'EUR',
+        3: 'DKK',
+        4: 'CAD',
+        5: 'SEK',
+        6: 'CHF',
+        7: 'JPY',
+        8: 'AUD'}
     for key in units:
         if key == p_table:
             table = units[key]
