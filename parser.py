@@ -48,8 +48,8 @@ def add_items(url):
         i4 = time_open + len(td_tag_open_time)
 
         data[cur] = (float(r.text[i2:purchase_cr_close_tag].strip().replace(',', '.')),
-                  float(r.text[i3:sale_cr_close_tg].strip().replace(',', '.')),
-                  str(r.text[i4:time_close].strip()))
+                     float(r.text[i3:sale_cr_close_tg].strip().replace(',', '.')),
+                     str(r.text[i4:time_close].strip()))
     return data
 
 
@@ -85,6 +85,7 @@ def insert_into_tables(con, data):
         cur.execute(query)
         con.commit()
         cur.close()
+
 
 url = 'https://www.banki.ru/products/currency/bank/mkb/moskva/'
 data = add_items(url)
