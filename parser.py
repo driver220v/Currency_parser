@@ -139,4 +139,4 @@ except ConnectionError:
 end = time()
 
 dif = end - start
-print(dif)
+
