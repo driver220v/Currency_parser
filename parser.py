@@ -3,7 +3,6 @@ import time
 from psycopg2 import connect
 from psycopg2.extensions import AsIs
 from requests.exceptions import ConnectionError
-
 start = time.time()
 
 
@@ -73,8 +72,7 @@ def add_items(url, units):
             str(req.text[i4:time_close].strip())
         )
     return data
-
-
+git 
 @logger
 @slow_watch(n=float(input('введите время в секундах для ф-ции connect_db: ')))
 def connection_db():
