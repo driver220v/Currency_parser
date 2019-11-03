@@ -86,7 +86,6 @@ def insert_into_tables(con, data):
         con.commit()
         cur.close()
 
-
 url = 'https://www.banki.ru/products/currency/bank/mkb/moskva/'
 data = add_items(url)
 con = connection_db()
