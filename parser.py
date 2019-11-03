@@ -1,10 +1,10 @@
 import requests
-from time import time
+import time
 from psycopg2 import connect
 from psycopg2.extensions import AsIs
 from requests.exceptions import ConnectionError
 
-start = time()
+start = time.time()
 
 
 def logger(original_function):
@@ -15,23 +15,22 @@ def logger(original_function):
     wrapper.called = 0
     return wrapper
 
-
 def slow_watch(n):
     def timer(original_func):
-        import time
+
         def wrapper(*args):
             start = time.time()
-            original_func(*args)
+            result = original_func(*args)
             end = time.time()
             difference = end - start
             if difference >= n:
                 print(f'function {original_func.__name__} executed in more then {n} second')
             else:
                 print(f'function {original_func.__name__} executed in less then {n} second')
+                return result
         return wrapper
     return timer
-
-print()
+@logger
 @slow_watch(n=float(input('введите время в секунд для add_items: ')))
 def add_items(url, units):
     req = requests.get(url)
@@ -77,7 +76,7 @@ def add_items(url, units):
 
 
 @logger
-@slow_watch(n=float(input('введите время в секундах: ')))
+@slow_watch(n=float(input('введите время в секундах для ф-ции connect_db: ')))
 def connection_db():
     con = connect(
         database="Currencies",
@@ -88,7 +87,7 @@ def connection_db():
     )
     return con
 
-
+@slow_watch(n=float(input('введите время в секундах для ф-ции create_tables: ')))
 def create_tables(con, data):
 
     for key in data:
@@ -104,7 +103,7 @@ def create_tables(con, data):
             con.commit()
             cur.close()
 
-
+@slow_watch(n=float(input('введите время в секундах для ф-ции insert_into_tables: ')))
 def insert_into_tables(con, data):
     for key, value in data.items():
         cur = con.cursor()
@@ -134,9 +133,11 @@ try:
 except ConnectionError:
     print('Connection error. Check your internet connection')
 
-#print('connection_db has been called', connection_db.called, 'time(s)')
+print('connection_db has been called', connection_db.called, 'time(s)')
 
-end = time()
+print('connection_db has been called', add_items.called, 'time(s)')
+
+end = time.time()
 
 dif = end - start
-
+print(dif)
