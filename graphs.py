@@ -95,9 +95,9 @@ p_table = int(input(
     'For exit press 0. '
     'Input number of unit: '
 ))
-# Enter dates between which exchange rate will be displayed
+# Input dates between which exchange rate will be displayed
 time_begin, time_end = (
-        input('Input intital date in "dd.mm.yyyy" format: '),
+        input('Input initial date in "dd.mm.yyyy" format: '),
         input('Input terminal date in "dd.mm.yyyy" format: ')
         )
 
