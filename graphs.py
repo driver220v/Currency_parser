@@ -13,31 +13,14 @@ def connection_db():
     return con
 
 
-def choose_unit(p_table):
-    table = ''
-    units = {
-        1: 'USD',
-        2: 'EUR',
-        3: 'DKK',
-        4: 'CAD',
-        5: 'SEK',
-        6: 'CHF',
-        7: 'JPY',
-        8: 'AUD'}
-    for key in units:
-        if key == p_table:
-            table = units[key]
-    return table
-
-
 def take_data(
-    con, table,
-    time_begin, time_end
+        con, table,
+        time_begin, time_end
 ):
-    
     cur = con.cursor()
-    cur.execute(f'''Select * from {table}
-                    where renew_date between '{time_begin}' and '{time_end}' ''')
+    cur.execute(f"""Select * from {table}
+                    where renew_date between '{time_begin}' and 
+                    '{time_end}' """)
     rows = cur.fetchall()
     return rows
 
@@ -80,38 +63,42 @@ def graph(rows, table):
 
 
 con = connection_db()
+units = {
+    1: 'USD',
+    2: 'EUR',
+    3: 'DKK',
+    4: 'CAD',
+    5: 'SEK',
+    6: 'CHF',
+    7: 'JPY',
+    8: 'AUD'
+}
+print(units)
 
-print('1 - USD',
-      '2 - EUR',
-      '3 - DKK',
-      '4 - CAD',
-      '5 - SEK',
-      '6 - CHF',
-      '7 - JPY',
-      '8 - AUD',
-      sep='\n'
-      )
-p_table = int(input(
-    'For exit press 0. '
-    'Input number of unit: '
-))
-# Input dates between which exchange rate will be displayed
-time_begin, time_end = (
+# input dates between which exchange rate will be displayed
+
+
+while True:
+    p_table = int(input(
+        'For exit press 0. '
+        'Input number of unit: '
+    ))
+    if p_table == 0:
+        break
+    if 1 < p_table or p_table >= 9:
+        print("Error")
+        break
+
+    table = units[p_table]
+    time_begin, time_end = (
         input('Input initial date in "dd.mm.yyyy" format: '),
         input('Input terminal date in "dd.mm.yyyy" format: ')
-        )
+    )
+    # check date
 
-while 1 <= p_table < 9:
-    table = choose_unit(p_table)
-    rows = take_data(con, table,
-                     time_begin, time_end)
+    rows = take_data(con,
+                     table,
+                     time_begin,
+                     time_end)
     graph(rows, table)
-    p_table = int(input('For exit press 0. Enter number of unit: '))
-    if p_table != 0:
-        time_begin, time_end = (
-        input('Input initial date in "dd.mm.yyyy" format: '),
-        input('Input terminal date in "dd.mm.yyyy" format: '))
-    else:
-        pass
-else:
-    pass
+
