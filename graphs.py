@@ -20,7 +20,7 @@ def take_data(
     cur = con.cursor()
     cur.execute(f"""Select * from {table}
                     where renew_date between '{time_begin}' and 
-                    '{time_end}' """)
+                                             '{time_end}' """)
     rows = cur.fetchall()
     return rows
 
