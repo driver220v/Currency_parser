@@ -75,8 +75,6 @@ units = {
 }
 print(units)
 
-# input dates between which exchange rate will be displayed
-
 
 while True:
     p_table = int(input(
@@ -88,7 +86,7 @@ while True:
     if 1 < p_table or p_table >= 9:
         print("Error")
         break
-
+# input dates between which exchange rate will be displayed
     table = units[p_table]
     time_begin, time_end = (
         input('Input initial date in "dd.mm.yyyy" format: '),
