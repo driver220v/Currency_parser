@@ -1,4 +1,6 @@
 import requests
+from bs4 import BeautifulSoup
+import re
 from time import time
 from psycopg2 import connect
 from psycopg2.extensions import AsIs
@@ -30,51 +32,43 @@ def slow_watch(n):
             else:
                 print(f'function {original_func.__name__} executed in less then {n} second')
                 return result
+
         return wrapper
+
     return timer
 
 
+
+def gen_courses_time(courses, renew_time):
+    for time, course in zip(renew_time, range(0, len(courses), 2)):
+        yield float(courses[course].group(0).replace(',','.')), float(courses[course + 1].group(0).replace(',', '.')), time.group(0)
+
 @slow_watch(n=float(input('input time in seconds for add_items: ')))
-def add_items(url, units):
-    req = requests.get(url)
-    beacon = req.text.find('<section class="widget" data-test="exchange-office-rates">')
+def add_items(url):
     data = {}
+    source = requests.get(url).text
+    soup = BeautifulSoup(source, 'lxml')
+    table = soup.body.tbody
 
-    for cur in units:
-        unit_search = req.text.find(cur, beacon)
-        if unit_search == -1:
-            continue
-        td_tag_open = '<td class="font-size-large">'
-        td_tag_close = '</td>'
+    units = table.find_all('td',
+                           class_="text-nowrap")
+    courses = table.find_all('td',
+                             class_="font-size-large")
+    time = table.find_all('td',
+                          class_="color-border-dark font-size-default")
 
-        purchase_cr_open_tag = req.text.find(td_tag_open,
-                                             unit_search)
-        purchase_cr_close_tag = req.text.find(td_tag_close,
-                                              purchase_cr_open_tag)
+    pattern_courses = re.compile(r'\d{2,3},\d+')
+    pattern_units = re.compile(r'[A-Z]+')
+    pattern_time = re.compile(r'\d{2}\.\d{2}\.\d+.\d{2}:\d+')
 
-        sale_cr_open_tg = req.text.find(td_tag_open,
-                                        purchase_cr_close_tag)
-        sale_cr_close_tg = req.text.find(td_tag_close,
-                                         sale_cr_open_tg)
+    matches_courses = pattern_courses.finditer(str(courses))
+    matches_time = pattern_time.finditer(str(time))
+    mathes_units = pattern_units.finditer(str(units))
 
-        td_tag_open_time = '<td class="color-border-dark font-size-default">'
-        time_open = req.text.find(td_tag_open_time,
-                                  sale_cr_close_tg)
-        time_close = req.text.find(td_tag_close,
-                                   time_open)
-
-        assert (purchase_cr_open_tag < sale_cr_open_tg
-                and purchase_cr_close_tag < sale_cr_open_tg
-                and time_open < time_close)
-        i2 = purchase_cr_open_tag + len(td_tag_open)
-        i3 = sale_cr_open_tg + len(td_tag_open)
-        i4 = time_open + len(td_tag_open_time)
-
-        data[cur] = (
-            float(req.text[i2:purchase_cr_close_tag].strip().replace(',', '.')),
-            float(req.text[i3:sale_cr_close_tg].strip().replace(',', '.')),
-            str(req.text[i4:time_close].strip())
-        )
+    for unit, course_time in zip(mathes_units,
+                                 gen_courses_time(list(matches_courses), matches_time)):
+        data[unit.group(0)] = course_time
+    print(data)
     return data
 
 
@@ -117,18 +111,9 @@ def insert_into_tables(con, data):
         cur.close()
 
 
-units = [
-    'USD',
-    'EUR',
-    'AUD',
-    'CAD',
-    'DKK',
-    'SEK',
-    'CHF',
-    'JPY']
 try:
     url = 'https://www.banki.ru/products/currency/bank/mkb/moskva/'
-    data = add_items(url, units)
+    data = add_items(url)
     con = connection_db()
     cur = create_tables(con, data)
     insert_Tables = insert_into_tables(con, data)
@@ -142,3 +127,4 @@ end = time()
 
 dif = end - start
 print(dif)
+
