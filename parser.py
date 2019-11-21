@@ -1,13 +1,12 @@
-import requests
-from bs4 import BeautifulSoup
 import re
+import requests
 from time import time
 from psycopg2 import connect
+from bs4 import BeautifulSoup
 from psycopg2.extensions import AsIs
 from requests.exceptions import ConnectionError
 
 start = time()
-
 
 def logger(original_function):
     def wrapper(*args):
