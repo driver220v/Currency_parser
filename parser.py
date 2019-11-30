@@ -76,7 +76,7 @@ def add_items(url):
 def connection_db():
     con = connect(
         database="Currencies",
-        user="postgres",
+        user="username",
         password='911',
         host="127.0.0.1",
         port="5432"
