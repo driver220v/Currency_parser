@@ -20,7 +20,6 @@ def logger(original_function):
 
 def slow_watch(n):
     def timer(original_func):
-        import time
         def wrapper(*args):
             start = time.time()
             result = original_func(*args)
